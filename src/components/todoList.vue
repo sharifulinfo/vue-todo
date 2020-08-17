@@ -2,8 +2,8 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <input type="text" class="form-control mb-2" v-model="newTodo" @keyup.enter="addTodo">
-    <table class="table">
-      <thead>
+    <table class="table table-striped table-borderd">
+      <thead class="bg-success">
       <tr>
         <th width="50"><input type="checkbox" @change="checkAll()" :checked="!anyRemaining"/></th>
         <th width="50">SL</th>
@@ -12,28 +12,8 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(todo,index) in todosFilters" :key="todo.id">
-        <td><input type="checkbox" :checked="todo.completed ? 'checked' : ''" @change="statusTodo(todo)"/></td>
-        <td class="font-weight-bold">{{todo.id}}</td>
-        <td>
-
-          <p class="font-weight-bold"
-            @dblclick="editTodo(todo)" 
-            v-if="todo.edit == false"  
-            :class="todo.completed ? 'completed':''">{{todo.title}}</p>
-
-          <input class="form-control" type="text"
-            v-else 
-            v-focus 
-            @blur="updateTodo(todo)" 
-            @keyup.enter="updateTodo(todo)" 
-            @keyup.esc="redoTodo(todo)" 
-            v-model="todo.title">
-
-        </td>
-
-        <td @click="removeTodo(index)">X</td>
-      </tr>
+      <todoItem v-for="(todo,index) in todosFilters" :key="todo.id" :todo="todo" :index="index" :checkAll="!anyRemaining" @removedTodo="removeTodo" @finishedUpdate="finishedUpdates" @ChangeStatus="finishedUpdates">
+      </todoItem>
       </tbody>
     </table>
     <div>
@@ -52,10 +32,14 @@
 </template>
 
 <script>
+import todoItem from './todoItem'
 export default {
   name: 'todoList',
   props: {
     msg: String
+  },
+  components:{
+    todoItem,
   },
   data () {
     return {
@@ -69,6 +53,7 @@ export default {
       ],
     }
   },
+
   directives: {
     focus: {
       inserted: function (el) {
@@ -114,38 +99,19 @@ export default {
     removeTodo(index){
       this.todos.splice(index,1);
     },
-    editTodo(todo){
-      this.todoCash = todo.title;
-      todo.edit = true;
-    },
-    updateTodo(todo){
-      if(todo.title.trim().length == 0){
-        todo.title = this.todoCash;
-      }
-      todo.edit = false;
-    },
-    redoTodo(todo){
-      todo.title = this.todoCash;
-      todo.edit = false;
-      this.todoCash = '';
-    },
-    statusTodo(todo){
-      todo.completed = !todo.completed;
-    },
+    
     checkAll(){
       this.todos.forEach((todo)=> todo.completed = event.target.checked);
     },
     clearCompleted(){
       this.todos = this.todos.filter(todo => !todo.completed);
+    },
+    finishedUpdates(data){
+      this.todos.splice(data.index,1,data.todo);
     }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.completed{
-  text-decoration: line-through;
-  color:gray;
-}
-</style>
+
