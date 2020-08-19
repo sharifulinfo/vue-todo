@@ -1,16 +1,20 @@
 <template>
   <div id="app">
+    <AddTodo/>
+    <FilterTodo/>
     <Todos/>
   </div>
 </template>
 
 <script>
-import Todos from './components/Todos.vue'
+import AddTodo from './components/NewTodo.vue';
+import Todos from './components/Todos.vue';
+import FilterTodo from './components/FilterTodo.vue';
 
 export default {
   name: 'App',
   components: {
-    Todos
+    Todos,AddTodo,FilterTodo
   }
 }
 </script>
